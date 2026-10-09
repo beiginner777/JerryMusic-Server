@@ -1,0 +1,28 @@
+# ===== 构建目录 =====
+build/
+cmake-build-*/
+
+# ===== IDE（CLion）=====
+.idea/
+*.iml
+
+# ===== 编译产物 =====
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+*.lib
+*.exe
+*.out
+
+# ===== 日志 =====
+*.log
+
+# ===== CMake 生成（防止在源码目录内构建）=====
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
