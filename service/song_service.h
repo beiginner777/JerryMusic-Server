@@ -9,6 +9,8 @@ namespace jerrymusic {
 class SongService {
 public:
     std::string listSongs();
+
+    std::string searchSongs(const std::string& keyword);
 };
 
 } // namespace jerrymusic

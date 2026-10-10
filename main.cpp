@@ -31,6 +31,33 @@ static std::string extractToken(const std::string& authHeader) {
     return "";
 }
 
+// 从 target 里提取查询参数（如 /api/search?q=foo → q 的值）
+static std::string extractQuery(const std::string& target, const std::string& key) {
+    auto qpos = target.find('?');
+    if (qpos == std::string::npos) return "";
+    std::string qs = target.substr(qpos + 1);
+    std::string prefix = key + "=";
+    auto kpos = qs.find(prefix);
+    if (kpos == std::string::npos) return "";
+    return qs.substr(kpos + prefix.size());
+}
+
+// 解析 "/api/playlists/{id}/songs"，成功返回 id，失败返回 -1
+static long parsePlaylistSongsPath(const std::string& target) {
+    const std::string prefix = "/api/playlists/";
+    const std::string suffix = "/songs";
+    if (target.compare(0, prefix.size(), prefix) != 0) return -1;
+    if (target.size() < prefix.size() + suffix.size()) return -1;
+    if (target.compare(target.size() - suffix.size(), suffix.size(), suffix) != 0) return -1;
+    std::string idStr = target.substr(prefix.size(), target.size() - prefix.size() - suffix.size());
+    if (idStr.empty()) return -1;
+    try {
+        return std::stol(idStr);
+    } catch (...) {
+        return -1;
+    }
+}
+
 // 路由 + 鉴权
 static std::string route(const std::string& target, http::verb method,
                          const std::string& body, const std::string& authHeader) {
@@ -44,7 +71,6 @@ static std::string route(const std::string& target, http::verb method,
         return h.handleLogin(body);
     }
 
-    // 以下接口需要 JWT 鉴权
     if (verifyToken(extractToken(authHeader)).empty()) {
         return error(401, "unauthorized");
     }
@@ -57,6 +83,26 @@ static std::string route(const std::string& target, http::verb method,
         PlaylistHandler h;
         return h.handleList();
     }
+
+    // 歌单详情 / 加入歌单（/api/playlists/{id}/songs）
+    long playlistId = parsePlaylistSongsPath(target);
+    if (playlistId > 0) {
+        if (method == http::verb::get) {
+            PlaylistHandler h;
+            return h.handleDetail(playlistId);
+        }
+        if (method == http::verb::post) {
+            PlaylistHandler h;
+            return h.handleAddSong(playlistId, body);
+        }
+    }
+
+    // 搜索（/api/search?q=）
+    if (method == http::verb::get && target.rfind("/api/search", 0) == 0) {
+        SongHandler h;
+        return h.handleSearch(extractQuery(target, "q"));
+    }
+
     return error(404, "not found");
 }
 

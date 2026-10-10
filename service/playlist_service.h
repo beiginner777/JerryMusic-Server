@@ -9,6 +9,10 @@ namespace jerrymusic {
 class PlaylistService {
 public:
     std::string listPlaylists();
+
+    std::string getPlaylistDetail(long playlistId);
+
+    std::string addSongToPlaylist(long playlistId, long songId);
 };
 
 } // namespace jerrymusic
