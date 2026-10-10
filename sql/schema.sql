@@ -34,3 +34,19 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO playlists (name) VALUES ('推荐歌单')
 ON CONFLICT DO NOTHING;
+
+select * from users;
+
+-- 歌单↔歌曲 关联表（阶段 3）
+CREATE TABLE IF NOT EXISTS playlist_songs (
+    playlist_id BIGINT REFERENCES playlists(id),
+    song_id     BIGINT REFERENCES songs(id),
+    position    INT,
+    PRIMARY KEY (playlist_id, song_id)
+);
+
+-- 种子：把歌 1、2 放进歌单 1（推荐歌单）
+INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
+    (1, 1, 1),
+    (1, 2, 2)
+ON CONFLICT DO NOTHING;

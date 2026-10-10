@@ -5,11 +5,13 @@
 namespace jerrymusic {
 
 /**
- * 歌曲 REST 接口：GET /api/songs。
+ * 歌曲 REST 接口：GET /api/songs、GET /api/search。
  */
 class SongHandler {
 public:
     std::string handleList();
+
+    std::string handleSearch(const std::string& query);
 private:
     SongService service_;
 };

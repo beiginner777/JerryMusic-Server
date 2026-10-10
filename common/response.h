@@ -1,5 +1,6 @@
 #pragma once
 #include <nlohmann/json.hpp>
+#include <iostream>
 #include <string>
 
 namespace jerrymusic {
@@ -12,6 +13,7 @@ inline std::string makeResponse(int code, const std::string& message, const json
     resp["code"] = code;
     resp["message"] = message;
     resp["data"] = data;
+    std::cout << "rep = " << resp.dump() << std::endl;
     return resp.dump();
 }
 
